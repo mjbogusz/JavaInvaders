@@ -1,0 +1,13 @@
+<project name="Invaders" basedir="." default="main">
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+	<target name="compile">
+		<mkdir dir="build" />
+		<javac srcdir="." destdir="build" includeAntRuntime="false" />
+	</target>
+	<target name="run">
+		<java classpath="build" classname="pl.mbogusz3.invaders.Invaders" />
+	</target>
+	<target name="main" depends="compile,run" />
+</project>
