@@ -84,7 +84,6 @@ public class InvadersController {
 
 				synchronized (model) {
 					model.recalculate(frameTime);
-					model.notifyView();
 				}
 
 				tickRateTimer.cancel();
@@ -98,6 +97,6 @@ public class InvadersController {
 		this.eventHandlerMap.put("exitGame", new OnExitEvent(this.model));
 		this.eventHandlerMap.put("keyDown", new OnKeyDownEvent(this.model));
 		this.eventHandlerMap.put("keyUp", new OnKeyUpEvent(this.model));
-		this.eventHandlerMap.put("timer", new OnViewTimerEvent(this.model));
+		this.eventHandlerMap.put("windowResized", new OnWindowResizedEvent(this.model));
 	}
 }
