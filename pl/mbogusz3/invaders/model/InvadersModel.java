@@ -7,20 +7,20 @@ import java.util.Observable;
  *
  */
 public class InvadersModel extends Observable {
-//	private final static int enemyRows = 3;
-//	private final static int enemyColumns = 5;
-//	private final static int obstacleCount = 6;
-//	private final static int obstacleHealth = 3;
+	private final static int enemyRows = 3;
+	private final static int enemyColumns = 5;
+	private final static int obstacleCount = 3;
 	private final static int playerHealth = 3;
-//	private final Enemy enemy;
+
+	private final Enemy enemy;
 	private final Player player;
-//	private Obstacle obstacles[];
+	private final Obstacles obstacles;
 	private boolean keyDownMap[];
 
 	public InvadersModel() {
-		// this.enemy = new Enemy();
+		this.enemy = new Enemy(enemyRows, enemyColumns);
 		this.player = new Player(playerHealth);
-		// this.obstacles = new Obstacle[obstacleCount];
+		this.obstacles = new Obstacles(obstacleCount);
 		this.keyDownMap = new boolean[256];
 	}
 
@@ -30,6 +30,12 @@ public class InvadersModel extends Observable {
 
 	public void startNewGame() {
 		System.out.println("New Game!");
+		this.player.respawn();
+		this.enemy.respawn();
+		this.obstacles.respawn();
+//		this.shots.clear();
+		this.setChanged();
+		this.notifyView();
 	}
 
 	/**
@@ -96,5 +102,13 @@ public class InvadersModel extends Observable {
 
 	public Player getPlayer() {
 		return this.player;
+	}
+
+	public Enemy getEnemy() {
+		return enemy;
+	}
+
+	public Obstacles getObstacles() {
+		return obstacles;
 	}
 }
