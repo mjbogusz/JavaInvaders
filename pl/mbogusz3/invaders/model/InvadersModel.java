@@ -21,9 +21,9 @@ public class InvadersModel extends Observable {
 	private boolean keyDownMap[];
 
 	public InvadersModel() {
-//		this.enemy = new Enemy();
+		// this.enemy = new Enemy();
 		this.player = new Player(playerHealth);
-//		this.obstacles = new Obstacle[obstacleCount];
+		// this.obstacles = new Obstacle[obstacleCount];
 		this.keyDownMap = new boolean[256];
 	}
 
@@ -40,19 +40,33 @@ public class InvadersModel extends Observable {
 	 * @param frameTime frame time, in seconds
 	 */
 	public void recalculate(double frameTime) {
+		recalculate(frameTime, false);
+	}
+
+	/**
+	 * Recalculate new game state
+	 * @param frameTime frame time, in seconds
+	 */
+	public void recalculate(double frameTime, boolean forceUpdate) {
+		boolean hasChanged = false;
 		boolean leftKeyDown = this.getKeyState(KeyEvent.VK_LEFT);
 		boolean rightKeyDown = this.getKeyState(KeyEvent.VK_RIGHT);
 		if(leftKeyDown && !rightKeyDown) {
 			this.player.move(-1, frameTime);
+			hasChanged = true;
 		} else if(!leftKeyDown && rightKeyDown) {
 			this.player.move(1, frameTime);
+			hasChanged = true;
 		}
 
-		this.setChanged();
+		if(hasChanged || forceUpdate) {
+			this.setChanged();
+			this.notifyView();
+		}
 	}
 
 	public void exit() {
-		System.out.println("Exiting, wait 200ms...");
+		System.out.println("Exiting, wait 200ms when we pretend to do a cleanup...");
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {
