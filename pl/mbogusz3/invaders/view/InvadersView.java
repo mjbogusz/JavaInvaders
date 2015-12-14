@@ -1,7 +1,7 @@
 package pl.mbogusz3.invaders.view;
 
 import pl.mbogusz3.invaders.controller.InvadersController;
-import pl.mbogusz3.invaders.model.InvadersModel;
+import pl.mbogusz3.invaders.model.InvadersModelDTO;
 import pl.mbogusz3.invaders.types.InvadersEvent;
 
 import java.awt.Color;
@@ -15,7 +15,7 @@ import javax.swing.*;
 
 public class InvadersView implements Observer {
 	private final InvadersController controller;
-	private final InvadersModel model;
+	private InvadersModelDTO model;
 
 	private JFrame frame;
 	private Container contentPane;
@@ -23,9 +23,8 @@ public class InvadersView implements Observer {
 	private JMenuItem menuNewGameItem;
 	private JLabel playerPositionLabel;
 
-	public InvadersView(InvadersController controller, InvadersModel model) {
+	public InvadersView(InvadersController controller) {
 		this.controller = controller;
-		this.model = model;
 
 		this.frame = new JFrame("Invaders!");
 		this.frame.setSize(640, 480);
@@ -48,10 +47,8 @@ public class InvadersView implements Observer {
 
 		this.contentPane = this.frame.getContentPane();
 		this.contentPane.setLayout(null);
-		Insets paneInsets = this.contentPane.getInsets();
 		this.playerPositionLabel = new JLabel("0.5");
 		this.contentPane.add(this.playerPositionLabel);
-		this.playerPositionLabel.setBounds(paneInsets.left + 20, paneInsets.top + 80, 40, 40);
 		this.playerPositionLabel.setOpaque(true);
 		this.playerPositionLabel.setBackground(new Color(255, 0, 0));
 	}
@@ -59,7 +56,9 @@ public class InvadersView implements Observer {
 	public void initialize() {
 		SwingUtilities.invokeLater(() -> {
 			Insets frameInsets = this.frame.getInsets();
-			this.frame.setSize(frameInsets.left + frameInsets.right + 640, frameInsets.top + frameInsets.bottom + 320);
+			Dimension frameSize = new Dimension(frameInsets.left + frameInsets.right + 640, frameInsets.top + frameInsets.bottom + 320);
+			this.frame.setMinimumSize(frameSize);
+			this.frame.setSize(frameSize);
 			this.frame.setVisible(true);
 			controller.putEvent(new InvadersEvent("windowResized"));
 
@@ -68,17 +67,19 @@ public class InvadersView implements Observer {
 	}
 
 	public void update(Observable observable, Object arg) {
+		this.model = (InvadersModelDTO)(arg);
+		SwingUtilities.invokeLater(this::redraw);
+	}
+
+	private void redraw() {
 		Insets paneInsets = this.contentPane.getInsets();
 		Dimension paneSize = this.contentPane.getSize();
-
-		SwingUtilities.invokeLater(() -> {
-			double playerPosition = model.getPlayer().getPosition();
-			double playerWidth = model.getPlayer().getWidth();
-			double playerPositionLeft = (playerPosition - 0.5 * playerWidth) * paneSize.width + paneInsets.left;
-			double playerPositionTop = (0.9 - 0.5 * playerWidth) * paneSize.height + paneInsets.top;
-			playerPositionLabel.setText(Double.toString(model.getPlayer().getPosition()));
-			playerPositionLabel.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
-		});
+		double playerPosition = model.getPlayer().getPosition();
+		double playerWidth = model.getPlayer().getWidth();
+		double playerPositionLeft = (playerPosition - 0.5 * playerWidth) * paneSize.width + paneInsets.left;
+		double playerPositionTop = (1 - playerWidth) * paneSize.height + paneInsets.top;
+		playerPositionLabel.setText(Integer.toString(model.getPlayer().getHealth()));
+		playerPositionLabel.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
 	}
 
 	private void addListeners() {
