@@ -13,16 +13,16 @@ public class Player {
 	public Player(int health) {
 		this.position = 0.5;
 		this.health = health;
-		this.halfWidth = this.width / 2;
+		this.halfWidth = width / 2;
 	}
 
 	/**
 	 * Move the player object.
 	 * @param direction -1: to the left, 1: to the right
-	 * @param time fraction of second the player was moving
+	 * @param time time in seconds (e.g. 0.01) the player was moving
 	 */
 	public void move(int direction, double time) {
-		this.position += direction * (this.speed / time);
+		this.position += direction * speed * time;
 		if(this.position < this.halfWidth) {
 			this.position = this.halfWidth;
 		} else if(this.position > (1.0 - this.halfWidth)) {
@@ -30,16 +30,12 @@ public class Player {
 		}
 	}
 
-	public void setPosition(double position) {
-		this.position = position;
-	}
-
 	public double getPosition() {
 		return this.position;
 	}
 
 	public double getWidth() {
-		return this.width;
+		return width;
 	}
 
 	public int getHealth() {
