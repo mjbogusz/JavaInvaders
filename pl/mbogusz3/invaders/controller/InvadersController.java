@@ -79,15 +79,18 @@ public class InvadersController {
 				newTime = System.nanoTime();
 				frameTime = (double) (newTime - previousTime) / 1000000000.0;
 				previousTime = newTime;
-				long nextDelay = 1000 / tickRate + (previousTime >= nextTime ? 0 : 1);
 				nextTime = previousTime + 1000000000 / tickRate;
 
 				synchronized (model) {
 					model.recalculate(frameTime);
 				}
 
+				long delay = (nextTime - System.nanoTime())/1000000;
+				if(delay < 0) {
+					delay = 0;
+				}
 				tickRateTimer.cancel();
-				startTimer(nextDelay);
+				startTimer(delay);
 			}
 		}, delay);
 	}
