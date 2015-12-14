@@ -10,6 +10,8 @@ public class OnNewGameEvent extends InvadersEventHandler {
 	}
 
 	public void execute(HashMap<String, String> payload) {
-		this.model.startNewGame();
+		synchronized (model) {
+			model.startNewGame();
+		}
 	}
 }

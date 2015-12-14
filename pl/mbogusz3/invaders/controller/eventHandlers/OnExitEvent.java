@@ -11,7 +11,9 @@ public class OnExitEvent extends InvadersEventHandler {
 	}
 
 	public void execute(HashMap<String, String> payload) throws InvadersExitException {
-		model.exit();
+		synchronized (model) {
+			model.exit();
+		}
 		throw new InvadersExitException();
 	}
 }
