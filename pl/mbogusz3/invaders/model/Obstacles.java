@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class Obstacles {
 	private final int count;
 	private final int strength;
-	private final boolean[][] state;
+	private final int[] state;
 
 	public Obstacles(int count) {
 		this(count, 2);
@@ -17,13 +17,11 @@ public class Obstacles {
 	public Obstacles(int count, int strength) {
 		this.count = count;
 		this.strength = strength;
-		this.state = new boolean[count][strength];
+		this.state = new int[count];
 	}
 
 	public void respawn() {
-		for(boolean[] s : this.state) {
-			Arrays.fill(s, true);
-		}
+		Arrays.fill(this.state, this.strength);
 	}
 
 	public int getCount() {
@@ -34,7 +32,7 @@ public class Obstacles {
 		return strength;
 	}
 
-	public boolean[][] getState() {
+	public int[] getState() {
 		return state;
 	}
 }
