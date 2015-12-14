@@ -2,9 +2,6 @@ package pl.mbogusz3.invaders.model;
 
 import java.awt.event.KeyEvent;
 import java.util.Observable;
-import pl.mbogusz3.invaders.model.Player;
-//import pl.mbogusz3.invaders.model.Enemy;
-//import pl.mbogusz3.invaders.model.Obstacle;
 
 /**
  *
@@ -28,7 +25,7 @@ public class InvadersModel extends Observable {
 	}
 
 	public void notifyView() {
-		this.notifyObservers();
+		this.notifyObservers(new InvadersModelDTO(this));
 	}
 
 	public void startNewGame() {
@@ -46,6 +43,7 @@ public class InvadersModel extends Observable {
 	/**
 	 * Recalculate new game state
 	 * @param frameTime frame time, in seconds
+	 * @param forceUpdate whether to force update
 	 */
 	public void recalculate(double frameTime, boolean forceUpdate) {
 		boolean hasChanged = false;
