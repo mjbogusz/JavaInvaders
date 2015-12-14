@@ -22,6 +22,7 @@ public class InvadersView implements Observer {
 	private JMenuItem menuQuitItem;
 	private JMenuItem menuNewGameItem;
 	private JLabel playerPositionLabel;
+	private JLabel fpsLabel;
 
 	public InvadersView(InvadersController controller) {
 		this.controller = controller;
@@ -51,6 +52,9 @@ public class InvadersView implements Observer {
 		this.contentPane.add(this.playerPositionLabel);
 		this.playerPositionLabel.setOpaque(true);
 		this.playerPositionLabel.setBackground(new Color(255, 0, 0));
+
+		this.fpsLabel = new JLabel("0.0");
+		this.contentPane.add(fpsLabel);
 	}
 
 	public void initialize() {
@@ -74,12 +78,16 @@ public class InvadersView implements Observer {
 	private void redraw() {
 		Insets paneInsets = this.contentPane.getInsets();
 		Dimension paneSize = this.contentPane.getSize();
+
 		double playerPosition = model.getPlayer().getPosition();
 		double playerWidth = model.getPlayer().getWidth();
 		double playerPositionLeft = (playerPosition - 0.5 * playerWidth) * paneSize.width + paneInsets.left;
 		double playerPositionTop = (1 - playerWidth) * paneSize.height + paneInsets.top;
 		playerPositionLabel.setText(Integer.toString(model.getPlayer().getHealth()));
 		playerPositionLabel.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
+
+		fpsLabel.setText(Double.toString(controller.getFPS()));
+		fpsLabel.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
 	}
 
 	private void addListeners() {

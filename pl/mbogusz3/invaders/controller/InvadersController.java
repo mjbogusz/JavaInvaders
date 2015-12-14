@@ -16,7 +16,7 @@ public class InvadersController {
 	private final InvadersModel model;
 	private final HashMap<String, InvadersEventHandler> eventHandlerMap;
 
-	private final static int tickRate = 100;
+	private final static int tickRate = 60;
 	private long previousTime;
 	private long nextTime;
 	private long newTime;
@@ -69,6 +69,10 @@ public class InvadersController {
 		}
 
 		System.exit(0);
+	}
+
+	public double getFPS() {
+		return (1.0/frameTime);
 	}
 
 	private void startTimer(long delay) {
