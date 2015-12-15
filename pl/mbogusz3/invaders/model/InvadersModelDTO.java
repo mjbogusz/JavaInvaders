@@ -8,11 +8,17 @@ public class InvadersModelDTO implements Serializable {
 	public final PlayerDTO player;
 	public final EnemyDTO enemy;
 	public final ObstaclesDTO obstacles;
+	public final ProjectileDTO playerProjectile;
 
 	public InvadersModelDTO(InvadersModel model) {
 		this.player = new PlayerDTO(model.getPlayer());
 		this.enemy = new EnemyDTO(model.getEnemy());
 		this.obstacles = new ObstaclesDTO(model.getObstacles());
+		if(model.getPlayerProjectile() != null) {
+			this.playerProjectile = new ProjectileDTO(model.getPlayerProjectile());
+		} else {
+			this.playerProjectile = null;
+		}
 	}
 
 	public class PlayerDTO {
@@ -99,6 +105,30 @@ public class InvadersModelDTO implements Serializable {
 		}
 	}
 
+	public class ProjectileDTO {
+		public final int orientation;
+		public final double positionX;
+		public final double positionY;
+
+		public ProjectileDTO(Projectile projectile) {
+			this.orientation = projectile.getOrientation();
+			this.positionX = projectile.getPositionX();
+			this.positionY = projectile.getPositionY();
+		}
+
+		public int getOrientation() {
+			return orientation;
+		}
+
+		public double getPositionX() {
+			return positionX;
+		}
+
+		public double getPositionY() {
+			return positionY;
+		}
+	}
+
 	public PlayerDTO getPlayer() {
 		return player;
 	}
@@ -109,5 +139,9 @@ public class InvadersModelDTO implements Serializable {
 
 	public ObstaclesDTO getObstacles() {
 		return obstacles;
+	}
+
+	public ProjectileDTO getPlayerProjectile() {
+		return playerProjectile;
 	}
 }
