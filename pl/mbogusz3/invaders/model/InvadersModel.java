@@ -12,10 +12,11 @@ public class InvadersModel extends Observable {
 	private final static int obstacleCount = 3;
 	private final static int playerHealth = 3;
 
-	private final Enemy enemy;
+	private boolean keyDownMap[];
 	private final Player player;
 	private final Obstacles obstacles;
-	private boolean keyDownMap[];
+	private final Enemy enemy;
+	private Projectile playerProjectile;
 
 	public InvadersModel() {
 		this.enemy = new Enemy(enemyRows, enemyColumns);
@@ -33,7 +34,7 @@ public class InvadersModel extends Observable {
 		this.player.respawn();
 		this.enemy.respawn();
 		this.obstacles.respawn();
-//		this.shots.clear();
+		this.playerProjectile = null;
 		this.setChanged();
 		this.notifyView();
 	}
@@ -53,6 +54,8 @@ public class InvadersModel extends Observable {
 	 */
 	public void recalculate(double frameTime, boolean forceUpdate) {
 		boolean hasChanged = false;
+
+		// Player movement
 		boolean leftKeyDown = this.getKeyState(KeyEvent.VK_LEFT);
 		boolean rightKeyDown = this.getKeyState(KeyEvent.VK_RIGHT);
 		if(leftKeyDown && !rightKeyDown) {
@@ -60,6 +63,20 @@ public class InvadersModel extends Observable {
 			hasChanged = true;
 		} else if(!leftKeyDown && rightKeyDown) {
 			this.player.move(1, frameTime);
+			hasChanged = true;
+		}
+
+		// Player shooting
+		boolean spaceKeyDown = this.getKeyState(KeyEvent.VK_SPACE);
+		if(this.playerProjectile == null && spaceKeyDown) {
+			this.playerProjectile = new Projectile(this.player.getPosition(), 0.9);
+			hasChanged = true;
+		}
+		if(this.playerProjectile != null) {
+			this.playerProjectile.move(frameTime);
+			if(this.playerProjectile.isInvalid()) {
+				this.playerProjectile = null;
+			}
 			hasChanged = true;
 		}
 
@@ -110,5 +127,9 @@ public class InvadersModel extends Observable {
 
 	public Obstacles getObstacles() {
 		return obstacles;
+	}
+
+	public Projectile getPlayerProjectile() {
+		return playerProjectile;
 	}
 }
