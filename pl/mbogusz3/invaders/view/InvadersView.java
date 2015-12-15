@@ -23,6 +23,7 @@ public class InvadersView implements Observer {
 	private JMenuItem menuNewGameItem;
 	private JLabel fpsLabel;
 	private JLabel player;
+	private JLabel playerProjectile;
 	private JLabel[] obstacles;
 
 	public InvadersView(InvadersController controller) {
@@ -53,6 +54,12 @@ public class InvadersView implements Observer {
 		this.contentPane.add(this.player);
 		this.player.setOpaque(true);
 		this.player.setBackground(new Color(255, 0, 0));
+
+		this.playerProjectile = new JLabel("");
+		this.contentPane.add(this.playerProjectile);
+		this.playerProjectile.setOpaque(true);
+		this.playerProjectile.setBackground(new Color(0, 0, 0));
+		this.playerProjectile.setVisible(false);
 
 		this.fpsLabel = new JLabel("0.0");
 		this.contentPane.add(fpsLabel);
@@ -111,6 +118,16 @@ public class InvadersView implements Observer {
 		// Draw enemy
 
 		// Draw shots
+		if(model.getPlayerProjectile() == null) {
+			this.playerProjectile.setVisible(false);
+		} else {
+			this.playerProjectile.setVisible(true);
+			double projectilePositionLeft = (paneSize.width * model.getPlayerProjectile().getPositionX()) + paneInsets.left - (playerWidth / 10.0);
+			double projectilePositionTop = (paneSize.height * model.getPlayerProjectile().getPositionY()) + paneInsets.top - (playerWidth / 10.0);
+			double projectileWidth = paneSize.width * playerWidth / 5.0;
+			double projectileHeight = paneSize.height * playerWidth / 5.0;
+			this.playerProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
+		}
 
 		// Additional draws
 		fpsLabel.setText(Double.toString(controller.getFPS()));
