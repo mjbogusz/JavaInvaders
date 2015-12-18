@@ -7,8 +7,6 @@ import pl.mbogusz3.invaders.types.InvadersEventHandler;
 import pl.mbogusz3.invaders.types.InvadersExitException;
 
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class InvadersController {
@@ -16,10 +14,9 @@ public class InvadersController {
 	private final InvadersModel model;
 	private final HashMap<String, InvadersEventHandler> eventHandlerMap;
 
+	private boolean running;
+	private Thread tickRateThread;
 	private final static int tickRate = 60;
-	private long previousTime;
-	private long nextTime;
-	private long newTime;
 	private double frameTime;
 
 	public InvadersController(InvadersModel model) {
@@ -27,6 +24,7 @@ public class InvadersController {
 		this.model = model;
 		this.eventHandlerMap = new HashMap<String, InvadersEventHandler>();
 		this.fillEventHandlerMap();
+		this.running = false;
 	}
 
 	public void putEvent(InvadersEvent event) {
@@ -41,10 +39,7 @@ public class InvadersController {
 		InvadersEvent event;
 		InvadersEventHandler eventHandler;
 
-		System.out.println("Controller: starting timer");
-		previousTime = System.nanoTime();
-		nextTime = previousTime + 1000000000 / tickRate;
-		startTimer(1000/tickRate);
+		this.startTimer();
 
 		System.out.println("Controller: starting main event loop");
 		while (true) {
@@ -68,6 +63,7 @@ public class InvadersController {
 			}
 		}
 
+		this.stopTimer();
 		System.exit(0);
 	}
 
@@ -75,28 +71,51 @@ public class InvadersController {
 		return (1.0/frameTime);
 	}
 
-	private void startTimer(long delay) {
-		Timer tickRateTimer = new Timer();
-		tickRateTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
+	private void startTimer() {
+		System.out.println("Controller: starting timer");
+
+		Runnable tickRateRunnable = () -> {
+			long previousTime = System.nanoTime();
+			long newTime;
+			long nextTime = previousTime + 1000000000 / tickRate;
+
+			long millisDelay = 1000/tickRate;
+
+			InvadersController.this.running = true;
+			while (InvadersController.this.running) {
+				try {
+					Thread.sleep(millisDelay);
+				} catch (InterruptedException e) {
+					System.out.println("Failed to sleep server timer thread: " + e);
+				}
+
 				newTime = System.nanoTime();
-				frameTime = (double) (newTime - previousTime) / 1000000000.0;
+				InvadersController.this.frameTime = (double)(newTime - previousTime) / 1000000000.0;
 				previousTime = newTime;
 				nextTime = previousTime + 1000000000 / tickRate;
 
-				synchronized (model) {
-					model.recalculate(frameTime);
+				synchronized (InvadersController.this.model) {
+					InvadersController.this.model.recalculate(frameTime);
 				}
 
-				long delay = (nextTime - System.nanoTime())/1000000;
-				if(delay < 0) {
+				long delay = (nextTime - System.nanoTime());
+				if (delay < 0) {
 					delay = 0;
 				}
-				tickRateTimer.cancel();
-				startTimer(delay);
+				millisDelay = delay / 1000000;
 			}
-		}, delay);
+		};
+		this.tickRateThread = new Thread(tickRateRunnable);
+		this.tickRateThread.start();
+	}
+
+	private void stopTimer() {
+		this.running = false;
+		try {
+			this.tickRateThread.join();
+		} catch (InterruptedException e) {
+			System.out.println("Failed stopping tickrate thread: " + e);
+		}
 	}
 
 	private void fillEventHandlerMap() {
