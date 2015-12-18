@@ -1,5 +1,7 @@
 package pl.mbogusz3.invaders.model;
 
+import pl.mbogusz3.invaders.DTO.InvadersModelDTO;
+
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
