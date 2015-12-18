@@ -1,7 +1,7 @@
 package pl.mbogusz3.invaders.view;
 
 import pl.mbogusz3.invaders.controller.InvadersController;
-import pl.mbogusz3.invaders.model.InvadersModelDTO;
+import pl.mbogusz3.invaders.DTO.InvadersModelDTO;
 import pl.mbogusz3.invaders.types.InvadersEvent;
 
 import java.awt.Color;
@@ -131,7 +131,7 @@ public class InvadersView implements Observer {
 
 		// Additional draws
 		fpsLabel.setText(Double.toString(controller.getFPS()));
-		fpsLabel.setBounds(1, 1, 40, 10);
+		fpsLabel.setBounds(5, 5, 60, 10);
 	}
 
 	private void addListeners() {
