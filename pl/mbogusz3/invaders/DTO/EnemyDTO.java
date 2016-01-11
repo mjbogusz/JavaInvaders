@@ -5,26 +5,26 @@ import pl.mbogusz3.invaders.model.Enemy;
 /**
  */
 public class EnemyDTO {
-	public final int rows;
-	public final int columns;
+	public final double unitWidth;
 	public final boolean[][] state;
 	public final double positionTop;
 	public final double positionLeft;
+	public final int firstColumn;
+	public final int lastColumn;
+	public final int firstRow;
 
 	public EnemyDTO(Enemy enemy) {
-		this.rows = enemy.getRows();
-		this.columns = enemy.getColumns();
+		this.unitWidth = enemy.getUnitWidth();
 		this.state = enemy.getState();
 		this.positionTop = enemy.getPositionTop();
 		this.positionLeft = enemy.getPositionLeft();
+		this.firstColumn = enemy.getFirstColumn();
+		this.lastColumn = enemy.getLastColumn();
+		this.firstRow = enemy.getFirstRow();
 	}
 
-	public int getRows() {
-		return rows;
-	}
-
-	public int getColumns() {
-		return columns;
+	public double getUnitWidth() {
+		return unitWidth;
 	}
 
 	public boolean[][] getState() {
@@ -37,5 +37,17 @@ public class EnemyDTO {
 
 	public double getPositionLeft() {
 		return positionLeft;
+	}
+
+	public int getFirstColumn() {
+		return firstColumn;
+	}
+
+	public int getLastColumn() {
+		return lastColumn;
+	}
+
+	public int getFirstRow() {
+		return firstRow;
 	}
 }
