@@ -82,6 +82,12 @@ public class InvadersModel extends Observable {
 			hasChanged = true;
 		}
 
+		// Enemy movement
+		if(this.enemy.isMoving()) {
+			this.enemy.move(frameTime);
+			hasChanged = true;
+		}
+
 		if(hasChanged || forceUpdate) {
 			this.setChanged();
 			this.notifyView();
