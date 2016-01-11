@@ -21,7 +21,7 @@ public class InvadersModel extends Observable {
 	private Projectile playerProjectile;
 
 	public InvadersModel() {
-		this.enemy = new Enemy(enemyRows, enemyColumns);
+		this.enemy = new Enemy();
 		this.player = new Player(playerHealth);
 		this.obstacles = new Obstacles(obstacleCount);
 		this.keyDownMap = new boolean[256];
