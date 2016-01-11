@@ -25,6 +25,7 @@ public class InvadersView implements Observer {
 	private JLabel player;
 	private JLabel playerProjectile;
 	private JLabel[] obstacles;
+	private JLabel[][] enemies;
 
 	public InvadersView(InvadersController controller) {
 		this.controller = controller;
@@ -53,12 +54,12 @@ public class InvadersView implements Observer {
 		this.player = new JLabel("0.5");
 		this.contentPane.add(this.player);
 		this.player.setOpaque(true);
-		this.player.setBackground(new Color(255, 0, 0));
+		this.player.setBackground(new Color(0, 0, 255));
 
 		this.playerProjectile = new JLabel("");
 		this.contentPane.add(this.playerProjectile);
 		this.playerProjectile.setOpaque(true);
-		this.playerProjectile.setBackground(new Color(0, 0, 0));
+		this.playerProjectile.setBackground(new Color(255, 0, 0));
 		this.playerProjectile.setVisible(false);
 
 		this.fpsLabel = new JLabel("0.0");
@@ -101,10 +102,10 @@ public class InvadersView implements Observer {
 		if(this.obstacles == null) {
 			this.obstacles = new JLabel[obstacleCount];
 			for(int i = 0; i < obstacleCount; i++) {
-				this.obstacles[i] = new JLabel("0");
+				this.obstacles[i] = new JLabel(Integer.toString(model.getObstacles().getStrength()));
 				this.contentPane.add(this.obstacles[i]);
 				this.obstacles[i].setOpaque(true);
-				this.obstacles[i].setBackground(new Color(0, 255, 0));
+				this.obstacles[i].setBackground(new Color(0, 207, 51));
 			}
 		}
 		double obstacleSpacerWidth = (paneSize.width / (2 * obstacleCount + 1));
@@ -116,6 +117,37 @@ public class InvadersView implements Observer {
 		}
 
 		// Draw enemy
+		int enemyRows = model.getEnemy().getFirstRow();
+		int enemyColumns = model.getEnemy().getLastColumn() - model.getEnemy().getFirstColumn();
+		// First time init of enemies
+		if(this.enemies == null) {
+			this.enemies = new JLabel[enemyRows][enemyColumns];
+			for(int i = 0; i < enemyRows; i++) {
+				for(int j = 0; j < enemyColumns; j++) {
+					this.enemies[i][j] = new JLabel();
+					this.contentPane.add(this.enemies[i][j]);
+					this.enemies[i][j].setOpaque(true);
+					this.enemies[i][j].setBackground(new Color(0, 0, 0));
+				}
+			}
+		}
+		double enemyWidth = model.getEnemy().getUnitWidth() * paneSize.width;
+		double unitPositionTop = model.getEnemy().getPositionTop() * paneSize.height;
+		for(int i = 0; i < enemyRows; i++) {
+			double unitPositionLeft = model.getEnemy().getPositionLeft() * paneSize.width;
+			unitPositionLeft -= (enemyColumns - 0.5) * enemyWidth;
+
+			for(int j = model.getEnemy().getFirstColumn(); j < model.getEnemy().getLastColumn(); j++) {
+				if(model.getEnemy().getState()[i][j]) {
+					this.enemies[i][j].setVisible(true);
+					this.enemies[i][j].setBounds((int)(unitPositionLeft), (int)(unitPositionTop), (int)(enemyWidth), (int)(0.05 * paneSize.height));
+				} else {
+					this.enemies[i][j].setVisible(false);
+				}
+				unitPositionLeft += 2 * enemyWidth;
+			}
+			unitPositionTop += 0.1 * paneSize.height;
+		}
 
 		// Draw shots
 		if(model.getPlayerProjectile() == null) {
