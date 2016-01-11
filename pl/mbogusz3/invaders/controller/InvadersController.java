@@ -102,6 +102,7 @@ public class InvadersController {
 				if (delay < 0) {
 					delay = 0;
 				}
+				delay += 500000;
 				millisDelay = delay / 1000000;
 			}
 		};
