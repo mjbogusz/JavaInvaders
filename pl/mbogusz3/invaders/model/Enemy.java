@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class Enemy {
 	public final static int rows = 4;
 	public final static int columns = 8;
-	public final static double initialSpeed = 0.2;
+	public final static double initialSpeed = 0.1;
 	private final double unitWidth;
 	private boolean[][] state;
 	private double positionTop;
@@ -18,6 +18,7 @@ public class Enemy {
 	private int firstColumn;
 	private int lastColumn;
 	private int firstRow;
+	private boolean isMoving;
 
 	public Enemy() {
 		this.state = new boolean[Enemy.rows][Enemy.columns];
@@ -37,6 +38,7 @@ public class Enemy {
 		this.positionTop = 0.0;
 		this.positionLeft = 0.5;
 		this.direction = 1;
+		this.isMoving = true;
 	}
 
 	public void move(double time) {
@@ -52,18 +54,18 @@ public class Enemy {
 				}
 			} else {
 				// Else, reverse movement direction and move half row down
-				this.positionTop += 0.05 * this.unitWidth;
+				this.positionTop += 0.02;
 				this.direction = -1;
 			}
 		} else if (direction == -1) {
 			// Same for opposite direction
 			if(this.positionLeft > halfWidth) {
-				this.positionLeft -= this.speed;
+				this.positionLeft -= this.speed * time;
 				if(this.positionLeft < halfWidth) {
 					this.positionLeft = halfWidth;
 				}
 			} else {
-				this.positionTop += 0.05 * this.unitWidth;
+				this.positionTop += 0.02;
 				this.direction = 1;
 			}
 		} else {
@@ -109,6 +111,10 @@ public class Enemy {
 
 	public int getFirstRow() {
 		return firstRow;
+	}
+
+	public boolean isMoving() {
+		return isMoving;
 	}
 
 	public double getSpeed() {
