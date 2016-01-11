@@ -11,7 +11,7 @@ public class PlayerDTO {
 
 	public PlayerDTO(Player player) {
 		this.health = player.getHealth();
-		this.width = player.getWidth();
+		this.width = Player.width;
 		this.position = player.getPosition();
 	}
 
