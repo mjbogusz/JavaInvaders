@@ -3,6 +3,7 @@ package pl.mbogusz3.invaders.model;
 import pl.mbogusz3.invaders.types.InvadersGameEndException;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  *
@@ -12,7 +13,9 @@ public class Enemy {
 	public final static int columns = 8;
 	public final static double initialSpeed = 0.1;
 	public final static double unitHeight = 0.05;
+	public final static double shotProbability = 0.3;
 	private final double unitWidth;
+	private final Random randomGenerator;
 	private boolean[][] state;
 	private double positionTop;
 	private double positionLeft;
@@ -28,6 +31,7 @@ public class Enemy {
 		this.respawn();
 		// In one screen there is space for 3 times the enemy columns - one is taken, one is spaces between them and one is spare space on sides
 		this.unitWidth = 1.0 / (Enemy.columns * 3);
+		this.randomGenerator = new Random();
 	}
 
 	public void respawn() {
@@ -35,8 +39,8 @@ public class Enemy {
 			Arrays.fill(s, true);
 		}
 		this.firstColumn = 0;
-		this.lastColumn = Enemy.columns;
-		this.firstRow = Enemy.rows;
+		this.lastColumn = Enemy.columns - 1;
+		this.firstRow = Enemy.rows - 1;
 		this.speed = Enemy.initialSpeed;
 		this.positionTop = 0.0;
 		this.positionLeft = 0.5;
@@ -46,7 +50,7 @@ public class Enemy {
 
 	public void move(double time) throws InvadersGameEndException {
 		// Determine enemy "army" width
-		double halfWidth = this.unitWidth * ((double)(this.lastColumn - this.firstColumn) - 0.5);
+		double halfWidth = this.unitWidth * ((double)(this.lastColumn - this.firstColumn + 1) - 0.5);
 		if(this.direction == 1) {
 			// Compare half the width of army with maximum position
 			if(this.positionLeft < (1.0 - halfWidth)) {
@@ -77,11 +81,37 @@ public class Enemy {
 		}
 
 		// Detect end of game
-		double height = (2 * this.firstRow - 1) * Enemy.unitHeight;
+		double height = (2 * this.firstRow + 1) * Enemy.unitHeight;
 		if(this.positionTop + height >= 0.8) {
 			System.out.println("GAME END");
 			throw new InvadersGameEndException();
 		}
+	}
+
+	public Projectile shoot(double time) {
+		// shooting probability
+		if(this.randomGenerator.nextDouble() > (Enemy.shotProbability * time)) {
+			return null;
+		}
+
+		// Decide which column is to shoot, then check whether any unit exists in that column
+		int shootingColumn = this.randomGenerator.nextInt(this.lastColumn - this.firstColumn) + this.firstColumn;
+		int shootingRow;
+		for(shootingRow = this.firstRow; shootingRow >= 0; shootingRow--) {
+			if(this.state[shootingRow][shootingColumn]) {
+				break;
+			}
+		}
+		if(shootingRow < 0) {
+			return null;
+		}
+
+		// Calculate projectile's position (here: shooting enemy unit's position)
+		double x = this.positionLeft + (2 * shootingColumn - this.lastColumn + this.firstColumn) * this.unitWidth;
+		double y = (2 * shootingRow + 1) * Enemy.unitHeight + this.positionTop;
+
+		// Return the new projectile, flying down (increasing Y position)
+		return new Projectile(x, y, 1, 0.3);
 	}
 
 	public boolean[][] getState() {
