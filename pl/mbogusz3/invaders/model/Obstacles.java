@@ -6,12 +6,13 @@ import java.util.Arrays;
  *
  */
 public class Obstacles {
+	public final static int defaultStrength = 4;
 	private final int count;
 	private final int strength;
 	private final int[] state;
 
 	public Obstacles(int count) {
-		this(count, 2);
+		this(count, Obstacles.defaultStrength);
 	}
 
 	public Obstacles(int count, int strength) {
