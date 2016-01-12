@@ -24,6 +24,7 @@ public class InvadersView implements Observer {
 	private JLabel fpsLabel;
 	private JLabel player;
 	private JLabel playerProjectile;
+	private JLabel enemyProjectile;
 	private JLabel[] obstacles;
 	private JLabel[][] enemies;
 
@@ -55,12 +56,21 @@ public class InvadersView implements Observer {
 		this.contentPane.add(this.player);
 		this.player.setOpaque(true);
 		this.player.setBackground(new Color(0, 0, 255));
+		this.player.setForeground(new Color(255, 255, 255));
+		this.player.setHorizontalTextPosition(SwingConstants.CENTER);
+		this.player.setVerticalTextPosition(SwingConstants.CENTER);
 
 		this.playerProjectile = new JLabel("");
 		this.contentPane.add(this.playerProjectile);
 		this.playerProjectile.setOpaque(true);
 		this.playerProjectile.setBackground(new Color(255, 0, 0));
 		this.playerProjectile.setVisible(false);
+
+		this.enemyProjectile = new JLabel("");
+		this.contentPane.add(this.enemyProjectile);
+		this.enemyProjectile.setOpaque(true);
+		this.enemyProjectile.setBackground(new Color(255, 146, 0));
+		this.enemyProjectile.setVisible(false);
 
 		this.fpsLabel = new JLabel("0.0");
 		this.contentPane.add(fpsLabel);
@@ -89,20 +99,20 @@ public class InvadersView implements Observer {
 		Dimension paneSize = this.contentPane.getSize();
 
 		// Draw player
-		double playerPosition = model.getPlayer().getPosition();
-		double playerWidth = model.getPlayer().getWidth();
+		double playerPosition = this.model.getPlayer().getPosition();
+		double playerWidth = this.model.getPlayer().getWidth();
 		double playerPositionLeft = (playerPosition - 0.5 * playerWidth) * paneSize.width + paneInsets.left;
 		double playerPositionTop = (1 - playerWidth) * paneSize.height + paneInsets.top;
-		player.setText(Integer.toString(model.getPlayer().getHealth()));
-		player.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
+		this.player.setText(Integer.toString(this.model.getPlayer().getHealth()));
+		this.player.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
 
 		// Draw obstacles
-		int obstacleCount = model.getObstacles().getCount();
+		int obstacleCount = this.model.getObstacles().getCount();
 		// First-time init of obstacles - we don't know their count before the game begins and first update comes
 		if(this.obstacles == null) {
 			this.obstacles = new JLabel[obstacleCount];
 			for(int i = 0; i < obstacleCount; i++) {
-				this.obstacles[i] = new JLabel(Integer.toString(model.getObstacles().getStrength()));
+				this.obstacles[i] = new JLabel("");
 				this.contentPane.add(this.obstacles[i]);
 				this.obstacles[i].setOpaque(true);
 				this.obstacles[i].setBackground(new Color(0, 207, 51));
@@ -110,15 +120,22 @@ public class InvadersView implements Observer {
 		}
 		double obstacleSpacerWidth = (paneSize.width / (2 * obstacleCount + 1));
 		for(int i = 0; i < obstacleCount; i++) {
+			int state = this.model.getObstacles().getState()[i];
+			if(state == 0) {
+				this.obstacles[i].setVisible(false);
+				continue;
+			} else {
+				this.obstacles[i].setVisible(true);
+			}
 			double obstaclePositionLeft = obstacleSpacerWidth * (2 * i + 1) + paneInsets.left;
 			double obstaclePositionTop = 0.8 * paneSize.height + paneInsets.left;
-			this.obstacles[i].setText(Integer.toString(model.getObstacles().getState()[i]));
+			this.obstacles[i].setText(Integer.toString(state));
 			this.obstacles[i].setBounds((int)(obstaclePositionLeft), (int)(obstaclePositionTop), (int)(obstacleSpacerWidth), (int)(0.1 * paneSize.height));
 		}
 
 		// Draw enemy
-		int enemyRows = model.getEnemy().getFirstRow();
-		int enemyColumns = model.getEnemy().getLastColumn() - model.getEnemy().getFirstColumn();
+		int enemyRows = this.model.getEnemy().getFirstRow() + 1;
+		int enemyColumns = this.model.getEnemy().getLastColumn() - this.model.getEnemy().getFirstColumn() + 1;
 		// First time init of enemies
 		if(this.enemies == null) {
 			this.enemies = new JLabel[enemyRows][enemyColumns];
@@ -131,14 +148,14 @@ public class InvadersView implements Observer {
 				}
 			}
 		}
-		double enemyWidth = model.getEnemy().getUnitWidth() * paneSize.width;
-		double unitPositionTop = model.getEnemy().getPositionTop() * paneSize.height;
+		double enemyWidth = this.model.getEnemy().getUnitWidth() * paneSize.width;
+		double unitPositionTop = this.model.getEnemy().getPositionTop() * paneSize.height;
 		for(int i = 0; i < enemyRows; i++) {
-			double unitPositionLeft = model.getEnemy().getPositionLeft() * paneSize.width;
+			double unitPositionLeft = this.model.getEnemy().getPositionLeft() * paneSize.width;
 			unitPositionLeft -= (enemyColumns - 0.5) * enemyWidth;
 
-			for(int j = model.getEnemy().getFirstColumn(); j < model.getEnemy().getLastColumn(); j++) {
-				if(model.getEnemy().getState()[i][j]) {
+			for(int j = this.model.getEnemy().getFirstColumn(); j <= this.model.getEnemy().getLastColumn(); j++) {
+				if(this.model.getEnemy().getState()[i][j]) {
 					this.enemies[i][j].setVisible(true);
 					this.enemies[i][j].setBounds((int)(unitPositionLeft), (int)(unitPositionTop), (int)(enemyWidth), (int)(0.05 * paneSize.height));
 				} else {
@@ -150,6 +167,7 @@ public class InvadersView implements Observer {
 		}
 
 		// Draw shots
+		// Player projectile
 		if(model.getPlayerProjectile() == null) {
 			this.playerProjectile.setVisible(false);
 		} else {
@@ -159,6 +177,17 @@ public class InvadersView implements Observer {
 			double projectileWidth = paneSize.width * playerWidth / 5.0;
 			double projectileHeight = paneSize.height * playerWidth / 5.0;
 			this.playerProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
+		}
+		// Enemy projectile
+		if(model.getEnemyProjectile() == null) {
+			this.enemyProjectile.setVisible(false);
+		} else {
+			this.enemyProjectile.setVisible(true);
+			double projectilePositionLeft = (paneSize.width * model.getEnemyProjectile().getPositionX()) + paneInsets.left - (playerWidth / 10.0);
+			double projectilePositionTop = (paneSize.height * model.getEnemyProjectile().getPositionY()) + paneInsets.top - (playerWidth / 10.0);
+			double projectileWidth = paneSize.width * playerWidth / 5.0;
+			double projectileHeight = paneSize.height * playerWidth / 5.0;
+			this.enemyProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
 		}
 
 		// Additional draws
