@@ -114,6 +114,10 @@ public class Enemy {
 		return new Projectile(x, y, 1, 0.3);
 	}
 
+	public void destroyUnit(int row, int column) {
+		this.state[row][column] = false;
+	}
+
 	public boolean[][] getState() {
 		return this.state;
 	}
