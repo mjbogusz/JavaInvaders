@@ -5,6 +5,7 @@ import pl.mbogusz3.invaders.model.InvadersModel;
 import pl.mbogusz3.invaders.types.InvadersEvent;
 import pl.mbogusz3.invaders.types.InvadersEventHandler;
 import pl.mbogusz3.invaders.types.InvadersExitException;
+import pl.mbogusz3.invaders.types.InvadersNewGameException;
 
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,8 +40,6 @@ public class InvadersController {
 		InvadersEvent event;
 		InvadersEventHandler eventHandler;
 
-		this.startTimer();
-
 		System.out.println("Controller: starting main event loop");
 		while (true) {
 			try {
@@ -55,6 +54,9 @@ public class InvadersController {
 				eventHandler.execute(event.payload);
 			} catch(NullPointerException e) {
 				System.out.println("Unknown event!");
+			} catch(InvadersNewGameException e) {
+				System.out.println("new game!");
+				this.startTimer();
 			} catch(InvadersExitException e) {
 				System.out.println("Caught exit exception, ending!");
 				break;
