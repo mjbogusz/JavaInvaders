@@ -4,6 +4,8 @@ package pl.mbogusz3.invaders.model;
  */
 public class Projectile {
 	public final static double defaultSpeed = 0.5;
+	public final static double width = 0.02;
+	public final static double height = 0.02;
 	/**
 	 * 1 is down, -1 is up - consistent with Y axis direction (increasing from top to bottom)
 	 */
@@ -45,6 +47,10 @@ public class Projectile {
 			this.positionY = 0.0;
 			this.invalid = true;
 		}
+	}
+
+	public void destroy() {
+		this.invalid = true;
 	}
 
 	public int getOrientation() {
