@@ -42,10 +42,10 @@ public class Player {
 	}
 
 	public double getPosition() {
-		return this.position;
+		return position;
 	}
 
 	public int getHealth() {
-		return this.health;
+		return health;
 	}
 }
