@@ -3,12 +3,13 @@ package pl.mbogusz3.invaders.model;
 /**
  */
 public class Projectile {
-	private final static double speed = 0.5;
+	public final static double defaultSpeed = 0.5;
 	/**
-	 * 1 is down, -1 is up
+	 * 1 is down, -1 is up - consistent with Y axis direction (increasing from top to bottom)
 	 */
 	private final int orientation;
 	private final double positionX;
+	private final double speed;
 	private double positionY;
 	private boolean invalid;
 
@@ -17,9 +18,18 @@ public class Projectile {
 	}
 
 	public Projectile(double positionX, double positionY, int orientation) {
+		this(positionX, positionY, orientation, Projectile.defaultSpeed);
+	}
+
+	public Projectile(double positionX, double positionY, double speed) {
+		this(positionX, positionY, -1, speed);
+	}
+
+	public Projectile(double positionX, double positionY, int orientation, double speed) {
 		this.positionX = positionX;
 		this.positionY = positionY;
 		this.orientation = orientation;
+		this.speed = speed;
 		this.invalid = false;
 	}
 
@@ -27,7 +37,7 @@ public class Projectile {
 		if(this.invalid) {
 			return;
 		}
-		this.positionY += speed * time * this.orientation;
+		this.positionY += this.speed * time * this.orientation;
 		if(this.positionY > 1.0) {
 			this.positionY = 1.0;
 			this.invalid = true;
