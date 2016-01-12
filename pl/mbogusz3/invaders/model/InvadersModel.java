@@ -1,6 +1,7 @@
 package pl.mbogusz3.invaders.model;
 
 import pl.mbogusz3.invaders.DTO.InvadersModelDTO;
+import pl.mbogusz3.invaders.types.InvadersGameEndException;
 
 import java.awt.event.KeyEvent;
 import java.util.Observable;
@@ -9,8 +10,6 @@ import java.util.Observable;
  *
  */
 public class InvadersModel extends Observable {
-	private final static int enemyRows = 3;
-	private final static int enemyColumns = 5;
 	private final static int obstacleCount = 3;
 	private final static int playerHealth = 3;
 
@@ -19,6 +18,7 @@ public class InvadersModel extends Observable {
 	private final Obstacles obstacles;
 	private final Enemy enemy;
 	private Projectile playerProjectile;
+	private boolean isGameOver;
 
 	public InvadersModel() {
 		this.enemy = new Enemy();
@@ -37,6 +37,7 @@ public class InvadersModel extends Observable {
 		this.enemy.respawn();
 		this.obstacles.respawn();
 		this.playerProjectile = null;
+		this.isGameOver = false;
 		this.setChanged();
 		this.notifyView();
 	}
@@ -84,9 +85,16 @@ public class InvadersModel extends Observable {
 
 		// Enemy movement
 		if(this.enemy.isMoving()) {
-			this.enemy.move(frameTime);
+			try {
+				this.enemy.move(frameTime);
+			} catch (InvadersGameEndException e) {
+				this.isGameOver = true;
+			}
 			hasChanged = true;
 		}
+
+		// Enemy shots?
+		// Collision detection
 
 		if(hasChanged || forceUpdate) {
 			this.setChanged();
@@ -139,5 +147,9 @@ public class InvadersModel extends Observable {
 
 	public Projectile getPlayerProjectile() {
 		return playerProjectile;
+	}
+
+	public boolean isGameOver() {
+		return isGameOver;
 	}
 }
