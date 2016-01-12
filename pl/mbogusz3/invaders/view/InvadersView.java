@@ -168,25 +168,25 @@ public class InvadersView implements Observer {
 
 		// Draw shots
 		// Player projectile
-		if(model.getPlayerProjectile() == null) {
+		if(this.model.getPlayerProjectile() == null) {
 			this.playerProjectile.setVisible(false);
 		} else {
 			this.playerProjectile.setVisible(true);
-			double projectilePositionLeft = (paneSize.width * model.getPlayerProjectile().getPositionX()) + paneInsets.left - (playerWidth / 10.0);
-			double projectilePositionTop = (paneSize.height * model.getPlayerProjectile().getPositionY()) + paneInsets.top - (playerWidth / 10.0);
-			double projectileWidth = paneSize.width * playerWidth / 5.0;
-			double projectileHeight = paneSize.height * playerWidth / 5.0;
+			double projectileWidth = paneSize.width * this.model.getPlayerProjectile().getWidth();
+			double projectileHeight = paneSize.height * this.model.getPlayerProjectile().getHeight();
+			double projectilePositionLeft = paneSize.width * this.model.getPlayerProjectile().getPositionX() - projectileWidth / 2 + paneInsets.left;
+			double projectilePositionTop = paneSize.height * this.model.getPlayerProjectile().getPositionY() - projectileHeight / 2 + paneInsets.top;
 			this.playerProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
 		}
 		// Enemy projectile
-		if(model.getEnemyProjectile() == null) {
+		if(this.model.getEnemyProjectile() == null) {
 			this.enemyProjectile.setVisible(false);
 		} else {
 			this.enemyProjectile.setVisible(true);
-			double projectilePositionLeft = (paneSize.width * model.getEnemyProjectile().getPositionX()) + paneInsets.left - (playerWidth / 10.0);
-			double projectilePositionTop = (paneSize.height * model.getEnemyProjectile().getPositionY()) + paneInsets.top - (playerWidth / 10.0);
-			double projectileWidth = paneSize.width * playerWidth / 5.0;
-			double projectileHeight = paneSize.height * playerWidth / 5.0;
+			double projectileWidth = paneSize.width * this.model.getEnemyProjectile().getWidth();
+			double projectileHeight = paneSize.height * this.model.getEnemyProjectile().getHeight();
+			double projectilePositionLeft = paneSize.width * this.model.getEnemyProjectile().getPositionX() - projectileWidth / 2 + paneInsets.left;
+			double projectilePositionTop = paneSize.height * this.model.getEnemyProjectile().getPositionY() - projectileHeight / 2 + paneInsets.top;
 			this.enemyProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
 		}
 
