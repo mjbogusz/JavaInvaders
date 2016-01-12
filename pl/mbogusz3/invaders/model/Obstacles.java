@@ -7,6 +7,8 @@ import java.util.Arrays;
  */
 public class Obstacles {
 	public final static int defaultStrength = 4;
+	public final static double height = 0.1;
+	public final static double positionTop = 0.85;
 	private final int count;
 	private final int strength;
 	private final int[] state;
@@ -35,5 +37,9 @@ public class Obstacles {
 
 	public int[] getState() {
 		return state;
+	}
+
+	public double getWidth() {
+		return 1.0 / (this.count * 2 + 1);
 	}
 }
