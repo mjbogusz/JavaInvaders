@@ -100,8 +100,8 @@ public class InvadersController {
 					InvadersController.this.model.recalculate(frameTime);
 				}
 
-				// Check game over
-				if(InvadersController.this.model.isGameOver()) {
+				// Check game over or won
+				if(InvadersController.this.model.isGameOver() || InvadersController.this.model.isGameWon()) {
 					InvadersController.this.stopTimer();
 				}
 
