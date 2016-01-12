@@ -116,6 +116,46 @@ public class Enemy {
 
 	public void destroyUnit(int row, int column) {
 		this.state[row][column] = false;
+		if(column == this.firstColumn || column == this.lastColumn) {
+			this.checkBorderColumn(column);
+		}
+		if(row == this.firstRow) {
+			boolean anyLeft = false;
+			for(int i = this.firstColumn; i <= this.lastColumn; i++) {
+				if(this.state[row][i]) {
+					anyLeft = true;
+					break;
+				}
+			}
+			if(!anyLeft) {
+				this.firstRow--;
+			}
+		}
+	}
+
+	private void checkBorderColumn(int column) {
+		if(column != this.firstColumn && column != this.lastColumn) {
+			return;
+		}
+
+		boolean anyLeft = false;
+		for(int i = 0; i <= this.firstRow; i++) {
+			if(this.state[i][column]) {
+				anyLeft = true;
+				break;
+			}
+		}
+		if(!anyLeft) {
+			if(column == this.firstColumn) {
+				this.firstColumn++;
+				this.positionLeft += this.unitWidth;
+				this.checkBorderColumn(column + 1);
+			} else {
+				this.lastColumn--;
+				this.positionLeft -= this.unitWidth;
+				this.checkBorderColumn(column - 1);
+			}
+		}
 	}
 
 	public boolean[][] getState() {
