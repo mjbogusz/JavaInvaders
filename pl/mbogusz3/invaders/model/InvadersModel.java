@@ -18,6 +18,7 @@ public class InvadersModel extends Observable {
 	private final Obstacles obstacles;
 	private final Enemy enemy;
 	private Projectile playerProjectile;
+	private Projectile enemyProjectile;
 	private boolean isGameOver;
 
 	public InvadersModel() {
@@ -32,7 +33,6 @@ public class InvadersModel extends Observable {
 	}
 
 	public void startNewGame() {
-		System.out.println("New Game!");
 		this.player.respawn();
 		this.enemy.respawn();
 		this.obstacles.respawn();
@@ -93,7 +93,17 @@ public class InvadersModel extends Observable {
 			hasChanged = true;
 		}
 
-		// Enemy shots?
+		// Enemy shots
+		if(this.enemyProjectile == null) {
+			this.enemyProjectile = this.enemy.shoot(frameTime);
+		}
+		if(this.enemyProjectile != null) {
+			this.enemyProjectile.move(frameTime);
+			if(this.enemyProjectile.isInvalid()) {
+				this.enemyProjectile = null;
+			}
+			hasChanged = true;
+		}
 		// Collision detection
 
 		if(hasChanged || forceUpdate) {
@@ -147,6 +157,10 @@ public class InvadersModel extends Observable {
 
 	public Projectile getPlayerProjectile() {
 		return playerProjectile;
+	}
+
+	public Projectile getEnemyProjectile() {
+		return enemyProjectile;
 	}
 
 	public boolean isGameOver() {
