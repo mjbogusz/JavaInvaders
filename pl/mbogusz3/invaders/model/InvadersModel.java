@@ -20,6 +20,7 @@ public class InvadersModel extends Observable {
 	private Projectile playerProjectile;
 	private Projectile enemyProjectile;
 	private boolean isGameOver;
+	private boolean isGameWon;
 
 	public InvadersModel() {
 		this.enemy = new Enemy();
@@ -38,6 +39,7 @@ public class InvadersModel extends Observable {
 		this.obstacles.respawn();
 		this.playerProjectile = null;
 		this.isGameOver = false;
+		this.isGameWon = false;
 		this.setChanged();
 		this.notifyView();
 	}
@@ -106,16 +108,18 @@ public class InvadersModel extends Observable {
 		}
 
 		// Collision detection
+		// Player projectile first, notice it moves from Y=1.0 towards Y=0.0
 		if(this.playerProjectile != null) {
+			boolean projectileCollision = false;
 			double projectileLeft = this.playerProjectile.getPositionX() - Projectile.width / 2.0;
 			double projectileRight = this.playerProjectile.getPositionX() + Projectile.width / 2.0;
 			double projectileTop = this.playerProjectile.getPositionY() - Projectile.height / 2.0;
 			double projectileBottom = this.playerProjectile.getPositionY() + Projectile.height / 2.0;
 			// First, collisions with obstacles (no damage)
-			boolean obstacleCollision = false;
 			double obstacleTop = Obstacles.positionTop - Obstacles.height / 2.0;
 			double obstacleBottom = Obstacles.positionTop + Obstacles.height / 2.0;
-			if(projectileTop > obstacleBottom && projectileBottom < obstacleTop) {
+			// Direction is -1 therefore the reversed comparison
+			if(projectileTop < obstacleBottom && projectileBottom > obstacleTop) {
 				for(int i = 0; i < this.obstacles.getCount(); i++) {
 					if(this.obstacles.getState()[i] == 0) {
 						continue;
@@ -123,19 +127,55 @@ public class InvadersModel extends Observable {
 					double obstacleLeft = (2.0 * i + 1.0) * this.obstacles.getWidth();
 					double obstacleRight = (2.0 * i + 2.0) * this.obstacles.getWidth();
 					if(projectileRight > obstacleLeft && projectileLeft < obstacleRight) {
-						obstacleCollision = true;
+						projectileCollision = true;
 						break;
 					}
 				}
 			}
 
-			if(obstacleCollision) {
-				this.playerProjectile.destroy();
-			} else {
-				// Then, collisions with enemies
-				///TODO
+			double enemiesBottom = this.enemy.getPositionTop() + (2 * this.enemy.getFirstRow() + 1) * Enemy.unitHeight;
+			// Then, collisions with enemies
+			if(!projectileCollision && projectileTop < enemiesBottom) {
+				// For each row
+				for(int i = this.enemy.getFirstRow(); i >= 0; i--) {
+					// Check whether projectile is at row's height
+					double enemyBottom = enemiesBottom - 2.0 * (this.enemy.getFirstRow() - i) * Enemy.unitHeight;
+					double enemyTop = enemyBottom - Enemy.unitHeight;
+					if(projectileTop > enemyBottom || projectileBottom < enemyTop) {
+						continue;
+					}
+
+					double middleColumn = (this.enemy.getLastColumn() - this.enemy.getFirstColumn()) / 2.0;
+					// Then for each column
+					for(int j = this.enemy.getFirstColumn(); j <= this.enemy.getLastColumn(); j++) {
+						if(!this.enemy.getState()[i][j]) {
+							continue;
+						}
+
+						// Calculate enemy horizontal position
+						// (Enemy unit middle is twice the unit width times count of units from middle position)
+						double enemyLeft = this.enemy.getPositionLeft() - (middleColumn - j) * 2 * this.enemy.getUnitWidth() - this.enemy.getUnitWidth() / 2.0;
+						double enemyRight = enemyLeft + this.enemy.getUnitWidth();
+						// And compare it to projectile's position
+						if(projectileRight > enemyLeft && projectileLeft < enemyRight) {
+							projectileCollision = true;
+							this.enemy.destroyUnit(i, j);
+							if(this.enemy.getFirstColumn() > this.enemy.getLastColumn()) {
+								this.isGameWon = true;
+							}
+							break;
+						}
+					}
+					if(projectileCollision) {
+						break;
+					}
+				}
+			}
+			if(projectileCollision) {
+				this.playerProjectile = null;
 			}
 		}
+		// Enemy projectiles
 		if(this.enemyProjectile != null) {
 			///TODO
 		}
@@ -199,5 +239,9 @@ public class InvadersModel extends Observable {
 
 	public boolean isGameOver() {
 		return isGameOver;
+	}
+
+	public boolean isGameWon() {
+		return isGameWon;
 	}
 }
