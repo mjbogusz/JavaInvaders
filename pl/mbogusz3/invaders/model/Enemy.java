@@ -1,5 +1,7 @@
 package pl.mbogusz3.invaders.model;
 
+import pl.mbogusz3.invaders.types.InvadersGameEndException;
+
 import java.util.Arrays;
 
 /**
@@ -9,6 +11,7 @@ public class Enemy {
 	public final static int rows = 4;
 	public final static int columns = 8;
 	public final static double initialSpeed = 0.1;
+	public final static double unitHeight = 0.05;
 	private final double unitWidth;
 	private boolean[][] state;
 	private double positionTop;
@@ -41,7 +44,7 @@ public class Enemy {
 		this.isMoving = true;
 	}
 
-	public void move(double time) {
+	public void move(double time) throws InvadersGameEndException {
 		// Determine enemy "army" width
 		double halfWidth = this.unitWidth * ((double)(this.lastColumn - this.firstColumn) - 0.5);
 		if(this.direction == 1) {
@@ -54,7 +57,7 @@ public class Enemy {
 				}
 			} else {
 				// Else, reverse movement direction and move half row down
-				this.positionTop += 0.02;
+				this.positionTop += Enemy.unitHeight / 2;
 				this.direction = -1;
 			}
 		} else if (direction == -1) {
@@ -65,7 +68,7 @@ public class Enemy {
 					this.positionLeft = halfWidth;
 				}
 			} else {
-				this.positionTop += 0.02;
+				this.positionTop += Enemy.unitHeight / 2;
 				this.direction = 1;
 			}
 		} else {
@@ -74,10 +77,10 @@ public class Enemy {
 		}
 
 		// Detect end of game
-		double height = (2 * (this.firstRow - Enemy.rows) - 1) * 0.1;
+		double height = (2 * this.firstRow - 1) * Enemy.unitHeight;
 		if(this.positionTop + height >= 0.8) {
 			System.out.println("GAME END");
-			// throw new InvadersGameEndException();
+			throw new InvadersGameEndException();
 		}
 	}
 
