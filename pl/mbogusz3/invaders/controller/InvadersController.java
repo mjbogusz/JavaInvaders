@@ -98,6 +98,11 @@ public class InvadersController {
 					InvadersController.this.model.recalculate(frameTime);
 				}
 
+				// Check game over
+				if(InvadersController.this.model.isGameOver()) {
+					InvadersController.this.stopTimer();
+				}
+
 				long delay = (nextTime - System.nanoTime());
 				if (delay < 0) {
 					delay = 0;
