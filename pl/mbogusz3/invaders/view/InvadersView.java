@@ -32,7 +32,7 @@ public class InvadersView implements Observer {
 		this.controller = controller;
 
 		this.frame = new JFrame("Invaders!");
-		this.frame.setSize(640, 480);
+		this.frame.setSize(600, 600);
 		this.frame.setLocationRelativeTo(null);
 		this.frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.frame.setFocusable(true);
@@ -79,7 +79,7 @@ public class InvadersView implements Observer {
 	public void initialize() {
 		SwingUtilities.invokeLater(() -> {
 			Insets frameInsets = this.frame.getInsets();
-			Dimension frameSize = new Dimension(frameInsets.left + frameInsets.right + 640, frameInsets.top + frameInsets.bottom + 320);
+			Dimension frameSize = new Dimension(frameInsets.left + frameInsets.right + 600, frameInsets.top + frameInsets.bottom + 600);
 			this.frame.setMinimumSize(frameSize);
 			this.frame.setSize(frameSize);
 			this.frame.setVisible(true);
@@ -154,7 +154,12 @@ public class InvadersView implements Observer {
 			double unitPositionLeft = this.model.getEnemy().getPositionLeft() * paneSize.width;
 			unitPositionLeft -= (enemyColumns - 0.5) * enemyWidth;
 
-			for(int j = this.model.getEnemy().getFirstColumn(); j <= this.model.getEnemy().getLastColumn(); j++) {
+			for(int j = 0; j < this.model.getEnemy().getColumns(); j++) {
+				if(j < this.model.getEnemy().getFirstColumn() || j > this.model.getEnemy().getLastColumn()) {
+					this.enemies[i][j].setVisible(false);
+					continue;
+				}
+
 				if(this.model.getEnemy().getState()[i][j]) {
 					this.enemies[i][j].setVisible(true);
 					this.enemies[i][j].setBounds((int)(unitPositionLeft), (int)(unitPositionTop), (int)(enemyWidth), (int)(0.05 * paneSize.height));
@@ -164,6 +169,11 @@ public class InvadersView implements Observer {
 				unitPositionLeft += 2 * enemyWidth;
 			}
 			unitPositionTop += 0.1 * paneSize.height;
+		}
+		for(int i = enemyRows; i < this.model.getEnemy().getRows(); i++) {
+			for(int j = 0; j < this.model.getEnemy().getColumns(); j++) {
+				this.enemies[i][j].setVisible(false);
+			}
 		}
 
 		// Draw shots
