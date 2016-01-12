@@ -104,7 +104,41 @@ public class InvadersModel extends Observable {
 			}
 			hasChanged = true;
 		}
+
 		// Collision detection
+		if(this.playerProjectile != null) {
+			double projectileLeft = this.playerProjectile.getPositionX() - Projectile.width / 2.0;
+			double projectileRight = this.playerProjectile.getPositionX() + Projectile.width / 2.0;
+			double projectileTop = this.playerProjectile.getPositionY() - Projectile.height / 2.0;
+			double projectileBottom = this.playerProjectile.getPositionY() + Projectile.height / 2.0;
+			// First, collisions with obstacles (no damage)
+			boolean obstacleCollision = false;
+			double obstacleTop = Obstacles.positionTop - Obstacles.height / 2.0;
+			double obstacleBottom = Obstacles.positionTop + Obstacles.height / 2.0;
+			if(projectileTop > obstacleBottom && projectileBottom < obstacleTop) {
+				for(int i = 0; i < this.obstacles.getCount(); i++) {
+					if(this.obstacles.getState()[i] == 0) {
+						continue;
+					}
+					double obstacleLeft = (2.0 * i + 1.0) * this.obstacles.getWidth();
+					double obstacleRight = (2.0 * i + 2.0) * this.obstacles.getWidth();
+					if(projectileRight > obstacleLeft && projectileLeft < obstacleRight) {
+						obstacleCollision = true;
+						break;
+					}
+				}
+			}
+
+			if(obstacleCollision) {
+				this.playerProjectile.destroy();
+			} else {
+				// Then, collisions with enemies
+				///TODO
+			}
+		}
+		if(this.enemyProjectile != null) {
+			///TODO
+		}
 
 		if(hasChanged || forceUpdate) {
 			this.setChanged();
