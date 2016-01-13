@@ -4,22 +4,22 @@ package pl.mbogusz3.invaders.model;
  *
  */
 public class Player {
+	public final static double height = 0.1;
 	public final static double width = 0.1;
+	public final static double positionTop = 0.95;
 	public final static double speed = 0.4;
+	public final static int defaultHealth = 3;
+	public final static double defaultPosition = 0.5;
 	private final int maxHealth;
-	private final double halfWidth;
 	private int health;
 	private double position;
 
 	public Player() {
-		this(3);
+		this(Player.defaultHealth);
 	}
 
 	public Player(int health) {
-		this.position = 0.5;
 		this.maxHealth = health;
-		this.health = health;
-		this.halfWidth = Player.width / 2;
 	}
 
 	/**
@@ -29,16 +29,25 @@ public class Player {
 	 */
 	public void move(int direction, double time) {
 		this.position += direction * Player.speed * time;
-		if(this.position < this.halfWidth) {
-			this.position = this.halfWidth;
-		} else if(this.position > (1.0 - this.halfWidth)) {
-			this.position = (1.0 - this.halfWidth);
+		double halfWidth = Player.width / 2.0;
+		if(this.position < halfWidth) {
+			this.position = halfWidth;
+		} else if(this.position > (1.0 - halfWidth)) {
+			this.position = (1.0 - halfWidth);
 		}
 	}
 
 	public void respawn() {
-		this.position = 0.5;
+		this.position = Player.defaultPosition;
 		this.health = this.maxHealth;
+	}
+
+	public void damage() {
+		this.damage(1);
+	}
+
+	public void damage(int damageValue) {
+		this.health -= damageValue;
 	}
 
 	public double getPosition() {
