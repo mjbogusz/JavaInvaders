@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="invaders:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/invaders_jar</output-path>
-    <root id="archive" name="invaders.jar">
-      <element id="module-output" name="invaders" />
-    </root>
-  </artifact>
-</component>
