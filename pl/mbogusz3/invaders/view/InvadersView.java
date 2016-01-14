@@ -4,10 +4,7 @@ import pl.mbogusz3.invaders.controller.InvadersController;
 import pl.mbogusz3.invaders.DTO.InvadersModelDTO;
 import pl.mbogusz3.invaders.types.InvadersEvent;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.Observer;
 import java.util.Observable;
@@ -22,6 +19,7 @@ public class InvadersView implements Observer {
 	private JMenuItem menuQuitItem;
 	private JMenuItem menuNewGameItem;
 	private JLabel fpsLabel;
+	private JLabel infoLabel;
 	private JLabel player;
 	private JLabel playerProjectile;
 	private JLabel enemyProjectile;
@@ -57,8 +55,8 @@ public class InvadersView implements Observer {
 		this.player.setOpaque(true);
 		this.player.setBackground(new Color(0, 0, 255));
 		this.player.setForeground(new Color(255, 255, 255));
-		this.player.setHorizontalTextPosition(SwingConstants.CENTER);
-		this.player.setVerticalTextPosition(SwingConstants.CENTER);
+		this.player.setVerticalAlignment(JLabel.CENTER);
+		this.player.setHorizontalAlignment(JLabel.CENTER);
 
 		this.playerProjectile = new JLabel("");
 		this.contentPane.add(this.playerProjectile);
@@ -74,6 +72,15 @@ public class InvadersView implements Observer {
 
 		this.fpsLabel = new JLabel("0.0");
 		this.contentPane.add(fpsLabel);
+		this.infoLabel = new JLabel("");
+		this.contentPane.add(infoLabel);
+		this.infoLabel.setVisible(false);
+		this.infoLabel.setOpaque(true);
+		this.infoLabel.setBackground(new Color(255, 127, 0));
+		this.infoLabel.setForeground(new Color(0, 0, 0));
+		this.infoLabel.setFont(new Font("monospace", Font.BOLD, 24));
+		this.infoLabel.setVerticalAlignment(JLabel.CENTER);
+		this.infoLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 
 	public void initialize() {
@@ -98,15 +105,47 @@ public class InvadersView implements Observer {
 		Insets paneInsets = this.contentPane.getInsets();
 		Dimension paneSize = this.contentPane.getSize();
 
-		// Draw player
+		drawPlayer(paneInsets, paneSize);
+		drawObstacles(paneInsets, paneSize);
+		drawEnemies(paneInsets, paneSize);
+		drawProjectiles(paneInsets, paneSize);
+
+		// Additional draws
+		fpsLabel.setText(Double.toString(controller.getFPS()));
+		fpsLabel.setBounds(5, 5, 60, 10);
+
+		if(this.model.isGameRunning()) {
+			this.infoLabel.setVisible(false);
+		} else {
+			if(this.model.isGameWon()) {
+				this.infoLabel.setText("Congratulations, earthling, this time you won!");
+			} else if(this.model.isGameOver()) {
+				this.infoLabel.setText("GAME OVER!");
+			} else {
+				this.infoLabel.setText("Select \"File -> New game\" to begin.");
+			}
+			this.infoLabel.setBounds(0, 0, paneSize.width, paneSize.height);
+			this.infoLabel.setVisible(true);
+		}
+	}
+
+	private void drawPlayer(Insets paneInsets, Dimension paneSize) {
+		if(!this.model.isGameRunning()) {
+			this.player.setVisible(false);
+			return;
+		} else {
+			this.player.setVisible(true);
+		}
+
 		double playerPosition = this.model.getPlayer().getPosition();
 		double playerWidth = this.model.getPlayer().getWidth();
 		double playerPositionLeft = (playerPosition - 0.5 * playerWidth) * paneSize.width + paneInsets.left;
 		double playerPositionTop = (1 - playerWidth) * paneSize.height + paneInsets.top;
 		this.player.setText(Integer.toString(this.model.getPlayer().getHealth()));
-		this.player.setBounds((int)(playerPositionLeft), (int)(playerPositionTop), (int)(playerWidth * paneSize.width), (int)(playerWidth * paneSize.height));
+		this.player.setBounds((int) (playerPositionLeft), (int) (playerPositionTop), (int) (playerWidth * paneSize.width), (int) (playerWidth * paneSize.height));
+	}
 
-		// Draw obstacles
+	private void drawObstacles(Insets paneInsets, Dimension paneSize) {
 		int obstacleCount = this.model.getObstacles().getCount();
 		// First-time init of obstacles - we don't know their count before the game begins and first update comes
 		if(this.obstacles == null) {
@@ -116,8 +155,18 @@ public class InvadersView implements Observer {
 				this.contentPane.add(this.obstacles[i]);
 				this.obstacles[i].setOpaque(true);
 				this.obstacles[i].setBackground(new Color(0, 207, 51));
+				this.obstacles[i].setVerticalAlignment(JLabel.CENTER);
+				this.obstacles[i].setHorizontalAlignment(JLabel.CENTER);
 			}
 		}
+
+		if(!this.model.isGameRunning()) {
+			for(int i = 0; i < obstacleCount; i++) {
+				this.obstacles[i].setVisible(false);
+			}
+			return;
+		}
+
 		double obstacleSpacerWidth = (paneSize.width / (2 * obstacleCount + 1));
 		for(int i = 0; i < obstacleCount; i++) {
 			int state = this.model.getObstacles().getState()[i];
@@ -128,12 +177,13 @@ public class InvadersView implements Observer {
 				this.obstacles[i].setVisible(true);
 			}
 			double obstaclePositionLeft = obstacleSpacerWidth * (2 * i + 1) + paneInsets.left;
-			double obstaclePositionTop = 0.8 * paneSize.height + paneInsets.left;
+			double obstaclePositionTop = 0.8 * paneSize.height + paneInsets.top;
 			this.obstacles[i].setText(Integer.toString(state));
 			this.obstacles[i].setBounds((int)(obstaclePositionLeft), (int)(obstaclePositionTop), (int)(obstacleSpacerWidth), (int)(0.1 * paneSize.height));
 		}
+	}
 
-		// Draw enemy
+	private void drawEnemies(Insets paneInsets, Dimension paneSize) {
 		int enemyRows = this.model.getEnemy().getFirstRow() + 1;
 		int enemyColumns = this.model.getEnemy().getLastColumn() - this.model.getEnemy().getFirstColumn() + 1;
 		// First time init of enemies
@@ -148,10 +198,20 @@ public class InvadersView implements Observer {
 				}
 			}
 		}
+
+		if(!this.model.isGameRunning()) {
+			for(int i = 0; i < this.model.getEnemy().getRows(); i++) {
+				for(int j = 0; j < this.model.getEnemy().getColumns(); j++) {
+					this.enemies[i][j].setVisible(false);
+				}
+			}
+			return;
+		}
+
 		double enemyWidth = this.model.getEnemy().getUnitWidth() * paneSize.width;
-		double unitPositionTop = this.model.getEnemy().getPositionTop() * paneSize.height;
+		double unitPositionTop = this.model.getEnemy().getPositionTop() * paneSize.height + paneInsets.top;
 		for(int i = 0; i < enemyRows; i++) {
-			double unitPositionLeft = this.model.getEnemy().getPositionLeft() * paneSize.width;
+			double unitPositionLeft = this.model.getEnemy().getPositionLeft() * paneSize.width + paneInsets.left;
 			unitPositionLeft -= (enemyColumns - 0.5) * enemyWidth;
 
 			for(int j = 0; j < this.model.getEnemy().getColumns(); j++) {
@@ -175,8 +235,15 @@ public class InvadersView implements Observer {
 				this.enemies[i][j].setVisible(false);
 			}
 		}
+	}
 
-		// Draw shots
+	private void drawProjectiles(Insets paneInsets, Dimension paneSize) {
+		if(!this.model.isGameRunning()) {
+			this.playerProjectile.setVisible(false);
+			this.enemyProjectile.setVisible(false);
+			return;
+		}
+
 		// Player projectile
 		if(this.model.getPlayerProjectile() == null) {
 			this.playerProjectile.setVisible(false);
@@ -199,10 +266,6 @@ public class InvadersView implements Observer {
 			double projectilePositionTop = paneSize.height * this.model.getEnemyProjectile().getPositionY() - projectileHeight / 2 + paneInsets.top;
 			this.enemyProjectile.setBounds((int)(projectilePositionLeft), (int)(projectilePositionTop), (int)(projectileWidth), (int)(projectileHeight));
 		}
-
-		// Additional draws
-		fpsLabel.setText(Double.toString(controller.getFPS()));
-		fpsLabel.setBounds(5, 5, 60, 10);
 	}
 
 	private void addListeners() {
