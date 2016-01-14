@@ -7,7 +7,7 @@ import pl.mbogusz3.invaders.controller.InvadersController;
 /**
  * Invaders, a java Space Invaders clone.
  * @author Maciej Bogusz <M.Bogusz@stud.elka.pw.edu.pl>
- * @version 0.0.4
+ * @version 0.1.1
  */
 public class Invaders {
 	/**
@@ -21,7 +21,6 @@ public class Invaders {
 
 		// Start the whole machinery
 		model.addObserver(view);
-
 		view.initialize();
 		controller.start();
 	}
