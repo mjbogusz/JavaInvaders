@@ -95,7 +95,12 @@ public class Enemy {
 		}
 
 		// Decide which column is to shoot, then check whether any unit exists in that column
-		int shootingColumn = this.randomGenerator.nextInt(this.lastColumn - this.firstColumn) + this.firstColumn;
+		int shootingColumn;
+		if(this.lastColumn > this.firstColumn) {
+			shootingColumn = this.randomGenerator.nextInt(this.lastColumn - this.firstColumn) + this.firstColumn;
+		} else {
+			shootingColumn = this.firstColumn;
+		}
 		int shootingRow;
 		for(shootingRow = this.firstRow; shootingRow >= 0; shootingRow--) {
 			if(this.state[shootingRow][shootingColumn]) {
@@ -149,11 +154,15 @@ public class Enemy {
 			if(column == this.firstColumn) {
 				this.firstColumn++;
 				this.positionLeft += this.unitWidth;
-				this.checkBorderColumn(column + 1);
+				if(this.firstColumn <= this.lastColumn) {
+					this.checkBorderColumn(column + 1);
+				}
 			} else {
 				this.lastColumn--;
 				this.positionLeft -= this.unitWidth;
-				this.checkBorderColumn(column - 1);
+				if(this.firstColumn <= this.lastColumn) {
+					this.checkBorderColumn(column - 1);
+				}
 			}
 		}
 	}
