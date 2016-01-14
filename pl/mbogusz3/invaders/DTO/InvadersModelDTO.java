@@ -12,6 +12,8 @@ public class InvadersModelDTO implements Serializable {
 	public final ObstaclesDTO obstacles;
 	public final ProjectileDTO playerProjectile;
 	public final ProjectileDTO enemyProjectile;
+	public final boolean isGameRunning;
+	public final boolean isGameWon;
 	public final boolean isGameOver;
 
 	public InvadersModelDTO(InvadersModel model) {
@@ -28,6 +30,8 @@ public class InvadersModelDTO implements Serializable {
 		} else {
 			this.enemyProjectile = null;
 		}
+		this.isGameRunning = model.isGameRunning();
+		this.isGameWon = model.isGameWon();
 		this.isGameOver = model.isGameOver();
 	}
 
@@ -49,6 +53,14 @@ public class InvadersModelDTO implements Serializable {
 
 	public ProjectileDTO getEnemyProjectile() {
 		return enemyProjectile;
+	}
+
+	public boolean isGameRunning() {
+		return isGameRunning;
+	}
+
+	public boolean isGameWon() {
+		return isGameWon;
 	}
 
 	public boolean isGameOver() {

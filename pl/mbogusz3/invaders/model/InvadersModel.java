@@ -22,6 +22,7 @@ public class InvadersModel extends Observable {
 	private Projectile playerProjectile;
 	private Projectile enemyProjectile;
 	private boolean hasChanged;
+	private boolean isGameRunning;
 	private boolean isGameOver;
 	private boolean isGameWon;
 
@@ -30,6 +31,9 @@ public class InvadersModel extends Observable {
 		this.player = new Player(playerHealth);
 		this.obstacles = new Obstacles(obstacleCount);
 		this.enemy = new Enemy();
+		this.isGameRunning = false;
+		this.isGameOver = false;
+		this.isGameWon = false;
 	}
 
 	public void notifyView() {
@@ -43,6 +47,7 @@ public class InvadersModel extends Observable {
 		this.obstacles.respawn();
 		this.playerProjectile = null;
 		this.enemyProjectile = null;
+		this.isGameRunning = true;
 		this.isGameOver = false;
 		this.isGameWon = false;
 		this.setChanged();
@@ -113,6 +118,7 @@ public class InvadersModel extends Observable {
 				this.enemy.move(frameTime);
 			} catch (InvadersGameEndException e) {
 				this.isGameOver = true;
+				this.isGameRunning = false;
 			}
 			this.hasChanged = true;
 		}
@@ -194,6 +200,7 @@ public class InvadersModel extends Observable {
 					// If enemy was shot down do game win check
 					if(this.enemy.getFirstColumn() > this.enemy.getLastColumn()) {
 						this.isGameWon = true;
+						this.isGameRunning = false;
 					}
 					return;
 				}
@@ -243,6 +250,7 @@ public class InvadersModel extends Observable {
 			this.player.damage();
 			if(this.player.getHealth() <= 0) {
 				this.isGameOver = true;
+				this.isGameRunning = false;
 			}
 		}
 	}
@@ -296,6 +304,10 @@ public class InvadersModel extends Observable {
 
 	public Projectile getEnemyProjectile() {
 		return enemyProjectile;
+	}
+
+	public boolean isGameRunning() {
+		return isGameRunning;
 	}
 
 	public boolean isGameOver() {
