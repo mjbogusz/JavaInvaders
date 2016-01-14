@@ -119,10 +119,12 @@ public class InvadersController {
 
 	private void stopTimer() {
 		this.running = false;
-		try {
-			this.tickRateThread.join();
-		} catch (InterruptedException e) {
-			System.out.println("Failed stopping tickrate thread: " + e);
+		if(this.tickRateThread != null) {
+			try {
+				this.tickRateThread.join();
+			} catch (InterruptedException e) {
+				System.out.println("Failed stopping tickrate thread: " + e);
+			}
 		}
 	}
 
