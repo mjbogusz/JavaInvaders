@@ -4,11 +4,22 @@ import pl.mbogusz3.invaders.model.InvadersModel;
 import pl.mbogusz3.invaders.types.InvadersEventHandler;
 import java.util.HashMap;
 
+/**
+ * This event handler class is used for handling "keyDown" event.
+ */
 public class OnKeyDownEvent extends InvadersEventHandler {
+	/**
+	 * OnKeyDownEvent class constructor.
+	 * @param model Invaders' model for this event handler.
+	 */
 	public OnKeyDownEvent(InvadersModel model) {
 		this.model = model;
 	}
 
+	/**
+	 * Handle "keyDown" event by calling model's {@link InvadersModel#setKeyDown(int)} method.
+	 * @param payload payload of event to handle, should contain Integer on "keyCode" field.
+	 */
 	public void execute(HashMap<String, String> payload) {
 		int keyCode = Integer.parseInt(payload.get("keyCode"));
 

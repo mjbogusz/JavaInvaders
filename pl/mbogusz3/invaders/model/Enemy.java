@@ -1,31 +1,84 @@
 package pl.mbogusz3.invaders.model;
 
+import com.sun.istack.internal.Nullable;
 import pl.mbogusz3.invaders.types.InvadersGameEndException;
 
 import java.util.Arrays;
 import java.util.Random;
 
 /**
- *
+ * Invaders' enemy 'army' model.
  */
 public class Enemy {
+	/**
+	 * Default number of rows of enemy army.
+	 */
 	public final static int rows = 4;
+	/**
+	 * Default number of columns of enemy army.
+	 */
 	public final static int columns = 8;
+	/**
+	 * Default initial speed of enemy army - fraction of screen travelled per second.
+	 */
 	public final static double initialSpeed = 0.1;
+	/**
+	 * Enemy unit's height.
+	 */
 	public final static double unitHeight = 0.05;
+	/**
+	 * Probability of enemy army shooting once per second.
+	 */
 	public final static double shotProbability = 0.3;
+	/**
+	 * Enemy unit's width, calculated in constructor.
+	 */
 	private final double unitWidth;
+	/**
+	 * Random number generator, used in shooting.
+	 */
 	private final Random randomGenerator;
+	/**
+	 * State of enemy's army, per-unit (true = alive, false = dead).
+	 */
 	private boolean[][] state;
+	/**
+	 * Enemy army's position from top (i.e. where it begins from).
+	 */
 	private double positionTop;
+	/**
+	 * Enemy army's average position from left (i.e. middle column's)
+	 */
 	private double positionLeft;
+	/**
+	 * Current speed of enemy's army.
+	 * @see #initialSpeed
+	 */
 	private double speed;
+	/**
+	 * Current movement direction of enemy's army. 1 is right, -1 is left.
+	 */
 	private int direction;
+	/**
+	 * Index of first active column in enemy's army (0 on respawn).
+	 */
 	private int firstColumn;
+	/**
+	 * Index of last active column in enemy's army ({@link #columns}-1 on respawn).
+	 */
 	private int lastColumn;
+	/**
+	 * Index of first (closest to player) row column in enemy's army ({@link #rows}-1 on respawn).
+	 */
 	private int firstRow;
+	/**
+	 * Whether the enemy army is moving. Unused.
+	 */
 	private boolean isMoving;
 
+	/**
+	 * Constructor of Invaders' enemy model.
+	 */
 	public Enemy() {
 		this.state = new boolean[Enemy.rows][Enemy.columns];
 		this.respawn();
@@ -34,6 +87,9 @@ public class Enemy {
 		this.randomGenerator = new Random();
 	}
 
+	/**
+	 * Respawn enemy's army, marking all units as alive and setting initial position.
+	 */
 	public void respawn() {
 		for(boolean[] s : this.state) {
 			Arrays.fill(s, true);
@@ -48,6 +104,11 @@ public class Enemy {
 		this.isMoving = true;
 	}
 
+	/**
+	 * Move the enemy army.
+	 * @param time time for which the army has moved (fraction of second).
+	 * @throws InvadersGameEndException if enemy has reached obstacles
+	 */
 	public void move(double time) throws InvadersGameEndException {
 		// Determine enemy "army" width
 		double halfWidth = this.unitWidth * ((double)(this.lastColumn - this.firstColumn + 1) - 0.5);
@@ -88,6 +149,12 @@ public class Enemy {
 		}
 	}
 
+	/**
+	 * Decide whether to shoot and if so return the shot projectile.
+	 * @param time time for which to calculate probability of shooting (fraction of second).
+	 * @return {@link Projectile} or null.
+	 */
+	@Nullable
 	public Projectile shoot(double time) {
 		// shooting probability
 		if(this.randomGenerator.nextDouble() > (Enemy.shotProbability * time)) {
@@ -119,6 +186,11 @@ public class Enemy {
 		return new Projectile(x, y, 1, 0.3);
 	}
 
+	/**
+	 * Destroy an enemy unit.
+	 * @param row row of unit to destroy.
+	 * @param column column of unit to destroy.
+	 */
 	public void destroyUnit(int row, int column) {
 		this.state[row][column] = false;
 		if(column == this.firstColumn || column == this.lastColumn) {
@@ -138,6 +210,10 @@ public class Enemy {
 		}
 	}
 
+	/**
+	 * Check whether border (i.e. first or last) column is empty and if so modify indices accordingly.
+	 * @param column index of column to check.
+	 */
 	private void checkBorderColumn(int column) {
 		if(column != this.firstColumn && column != this.lastColumn) {
 			return;
@@ -167,43 +243,67 @@ public class Enemy {
 		}
 	}
 
+	/**
+	 * Retrieve current state of enemy army.
+	 * @return enemy army's state.
+	 */
 	public boolean[][] getState() {
 		return this.state;
 	}
 
+	/**
+	 * Retrieve current vertical position (distance from top) of enemy army.
+	 * @return enemy army's vertical position.
+	 */
 	public double getPositionTop() {
 		return positionTop;
 	}
 
+	/**
+	 * Retrieve current horizontal position (distance from left) of enemy army, measured to middle column.
+	 * @return enemy army's horizontal position.
+	 */
 	public double getPositionLeft() {
 		return positionLeft;
 	}
 
+	/**
+	 * Retrieve calculated width of enemy army's unit.
+	 * @return unit's width.
+	 */
 	public double getUnitWidth() {
 		return unitWidth;
 	}
 
-	public int getDirection() {
-		return direction;
-	}
-
+	/**
+	 * Retrieve index of first active (not empty) column in army.
+	 * @return first column's index.
+	 */
 	public int getFirstColumn() {
 		return firstColumn;
 	}
 
+	/**
+	 * Retrieve index of last active (not empty) column in army.
+	 * @return last column's index.
+	 */
 	public int getLastColumn() {
 		return lastColumn;
 	}
 
+	/**
+	 * Retrieve index of first (from bottom, i.e. biggest index) active (not empty) row in army.
+	 * @return first row's index.
+	 */
 	public int getFirstRow() {
 		return firstRow;
 	}
 
+	/**
+	 * Retrieve information whether the enemy's army is moving.
+	 * @return whether army is moving.
+	 */
 	public boolean isMoving() {
 		return isMoving;
-	}
-
-	public double getSpeed() {
-		return speed;
 	}
 }

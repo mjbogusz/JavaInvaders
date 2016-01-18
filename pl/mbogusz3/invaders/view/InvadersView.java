@@ -10,22 +10,68 @@ import java.util.Observer;
 import java.util.Observable;
 import javax.swing.*;
 
+/**
+ * View class of the Invaders game, implements Java Observer interface.
+ * Responsible of handling updates from model (Observer) passed as DTO objects and of displaying game interface
+ */
 public class InvadersView implements Observer {
+	/**
+	 * Invaders' controller object. Used for putting events into event queue and retrieving FPS.
+	 */
 	private final InvadersController controller;
+	/**
+	 * Invaders' model DTO, received in update().
+	 */
 	private InvadersModelDTO model;
-
+	/**
+	 * Main Swing frame.
+	 */
 	private JFrame frame;
+	/**
+	 * Main Swing content pane inside frame.
+	 */
 	private Container contentPane;
+	/**
+	 * Quit menu item.
+	 */
 	private JMenuItem menuQuitItem;
+	/**
+	 * New game menu item.
+	 */
 	private JMenuItem menuNewGameItem;
+	/**
+	 * Label for displaying inner FPS (from controller)
+	 */
 	private JLabel fpsLabel;
+	/**
+	 * Overlay label, displaying "game won", "game over" etc.
+	 */
 	private JLabel infoLabel;
+	/**
+	 * Player label.
+	 */
 	private JLabel player;
+	/**
+	 * Player's projectile label.
+	 */
 	private JLabel playerProjectile;
+	/**
+	 * Enemy's projectile label.
+	 */
 	private JLabel enemyProjectile;
+	/**
+	 * Obstacles' labels.
+	 */
 	private JLabel[] obstacles;
+	/**
+	 * Enemies' labels.
+	 */
 	private JLabel[][] enemies;
 
+	/**
+	 * Constructor of InvadersView class, creates and initializes inner elements
+	 * @param controller Controller of Invaders game - used for putting events into event queue and retrieving FPS.
+	 */
 	public InvadersView(InvadersController controller) {
 		this.controller = controller;
 
@@ -83,6 +129,9 @@ public class InvadersView implements Observer {
 		this.infoLabel.setHorizontalAlignment(JLabel.CENTER);
 	}
 
+	/**
+	 * Initialize the view, i.e. actually initialize and display the frame and bind actions to listeners.
+	 */
 	public void initialize() {
 		SwingUtilities.invokeLater(() -> {
 			Insets frameInsets = this.frame.getInsets();
@@ -96,11 +145,19 @@ public class InvadersView implements Observer {
 		});
 	}
 
+	/**
+	 * Update based on data from Observable. This is the implementation of Observer interface.
+	 * @param observable Observable object, internally ignored.
+	 * @param arg Update argument object, must be InvadersModelDTO-castable.
+	 */
 	public void update(Observable observable, Object arg) {
 		this.model = (InvadersModelDTO)(arg);
 		SwingUtilities.invokeLater(this::redraw);
 	}
 
+	/**
+	 * Redraw the interface. Called from update().
+	 */
 	private void redraw() {
 		Insets paneInsets = this.contentPane.getInsets();
 		Dimension paneSize = this.contentPane.getSize();
@@ -129,6 +186,11 @@ public class InvadersView implements Observer {
 		}
 	}
 
+	/**
+	 * Draw player. Called from update().
+	 * @param paneInsets insets of main content pane.
+	 * @param paneSize size of main content pane.
+	 */
 	private void drawPlayer(Insets paneInsets, Dimension paneSize) {
 		if(!this.model.isGameRunning()) {
 			this.player.setVisible(false);
@@ -145,6 +207,11 @@ public class InvadersView implements Observer {
 		this.player.setBounds((int) (playerPositionLeft), (int) (playerPositionTop), (int) (playerWidth * paneSize.width), (int) (playerWidth * paneSize.height));
 	}
 
+	/**
+	 * Draw obstacles. Called from update().
+	 * @param paneInsets insets of main content pane.
+	 * @param paneSize size of main content pane.
+	 */
 	private void drawObstacles(Insets paneInsets, Dimension paneSize) {
 		int obstacleCount = this.model.getObstacles().getCount();
 		// First-time init of obstacles - we don't know their count before the game begins and first update comes
@@ -183,6 +250,11 @@ public class InvadersView implements Observer {
 		}
 	}
 
+	/**
+	 * Draw enemy units. Called from update().
+	 * @param paneInsets insets of main content pane.
+	 * @param paneSize size of main content pane.
+	 */
 	private void drawEnemies(Insets paneInsets, Dimension paneSize) {
 		int enemyRows = this.model.getEnemy().getFirstRow() + 1;
 		int enemyColumns = this.model.getEnemy().getLastColumn() - this.model.getEnemy().getFirstColumn() + 1;
@@ -237,6 +309,11 @@ public class InvadersView implements Observer {
 		}
 	}
 
+	/**
+	 * Draw projectiles (player's and enemy's). Called from update().
+	 * @param paneInsets insets of main content pane.
+	 * @param paneSize size of main content pane.
+	 */
 	private void drawProjectiles(Insets paneInsets, Dimension paneSize) {
 		if(!this.model.isGameRunning()) {
 			this.playerProjectile.setVisible(false);
@@ -268,6 +345,9 @@ public class InvadersView implements Observer {
 		}
 	}
 
+	/**
+	 * Add swing listeners to actions.
+	 */
 	private void addListeners() {
 		InvadersController controller = this.controller;
 		menuNewGameItem.addActionListener(event -> controller.putEvent(new InvadersEvent("newGame")));
@@ -310,6 +390,9 @@ public class InvadersView implements Observer {
 		});
 	}
 
+	/**
+	 * Close the view (frame).
+	 */
 	private void closeView() {
 		SwingUtilities.invokeLater(() -> {
 			frame.setVisible(false);
