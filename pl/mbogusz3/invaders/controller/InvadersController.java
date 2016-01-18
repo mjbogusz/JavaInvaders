@@ -10,16 +10,44 @@ import pl.mbogusz3.invaders.types.InvadersNewGameException;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Controller class of Invaders game.
+ * Responsible of managing the event queue (communication on View->Model line), executing received events and running timer loop (executing calculations every tick).
+ */
 public class InvadersController {
+	/**
+	 * Tickrate - rate at which internal ticks occur, i.e. how many times per second a new model state is being calculated based on passed time.
+	 */
+	public final static int tickRate = 60;
+	/**
+	 * Event queue, main Controller's concern.
+	 */
 	private final LinkedBlockingQueue<InvadersEvent> eventQueue;
+	/**
+	 * Invaders' game model, storing data and doing calculations.
+	 */
 	private final InvadersModel model;
+	/**
+	 * Event handlers' map, keyed by event name.
+	 */
 	private final HashMap<String, InvadersEventHandler> eventHandlerMap;
-
+	/**
+	 * Whether the timer thread is running.
+	 */
 	private boolean running;
+	/**
+	 * Timer loop thread, executing calculations every tick.
+	 */
 	private Thread tickRateThread;
-	private final static int tickRate = 60;
+	/**
+	 * Last frame time, used only for getFPS().
+	 */
 	private double frameTime;
 
+	/**
+	 * Constructor of InvadersController class, initializing inner event queue and event handlers.
+	 * @param model InvadersModel object, used for all the calculations.
+	 */
 	public InvadersController(InvadersModel model) {
 		this.eventQueue = new LinkedBlockingQueue<InvadersEvent>();
 		this.model = model;
@@ -28,6 +56,10 @@ public class InvadersController {
 		this.running = false;
 	}
 
+	/**
+	 * Put an event into the event queue.
+	 * @param event Event to put in queue
+	 */
 	public void putEvent(InvadersEvent event) {
 		try {
 			eventQueue.put(event);
@@ -36,6 +68,9 @@ public class InvadersController {
 		}
 	}
 
+	/**
+	 * Start the main game loop - begin processing events.
+	 */
 	public void start() {
 		InvadersEvent event;
 		InvadersEventHandler eventHandler;
@@ -69,10 +104,17 @@ public class InvadersController {
 		System.exit(0);
 	}
 
+	/**
+	 * Retrieve current 'backend' FPS (1/actual tickrate)
+	 * @return current FPS count (not cached/averaged!)
+	 */
 	public double getFPS() {
 		return (1.0/frameTime);
 	}
 
+	/**
+	 * Start inner timer thread, executing calculations every tick
+	 */
 	private void startTimer() {
 		System.out.println("Controller: starting timer");
 
@@ -117,6 +159,9 @@ public class InvadersController {
 		this.tickRateThread.start();
 	}
 
+	/**
+	 * Wait for inner timer thread to stop.
+	 */
 	private void stopTimer() {
 		this.running = false;
 		if(this.tickRateThread != null) {
@@ -128,6 +173,9 @@ public class InvadersController {
 		}
 	}
 
+	/**
+	 * Fill up event handler map (statically).
+	 */
 	private void fillEventHandlerMap() {
 		this.eventHandlerMap.put("newGame", new OnNewGameEvent(this.model));
 		this.eventHandlerMap.put("exitGame", new OnExitEvent(this.model));
