@@ -6,8 +6,8 @@ import pl.mbogusz3.invaders.controller.InvadersController;
 
 /**
  * Invaders, a java Space Invaders clone, made using MVC.
- * @author Maciej Bogusz <M.Bogusz@stud.elka.pw.edu.pl>
- * @version 0.1.1
+ * @author Maciej Bogusz {@literal "<M.Bogusz@stud.elka.pw.edu.pl>"}
+ * @version 0.1.2
  */
 public class Invaders {
 	/**

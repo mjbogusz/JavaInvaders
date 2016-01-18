@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Controller class of Invaders game.
- * Responsible of managing the event queue (communication on View->Model line), executing received events and running timer loop (executing calculations every tick).
+ * Responsible of managing the event queue (communication on View-to-Model line), executing received events and running timer loop (executing calculations every tick).
  */
 public class InvadersController {
 	/**
